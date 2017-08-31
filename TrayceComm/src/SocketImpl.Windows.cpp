@@ -7,7 +7,7 @@ namespace Trayce { namespace Comm {
 namespace {
     struct Winsock2Initialization{
         Winsock2Initialization() {
-            WSA
+            //WSAStartup();
         }
     };
 
