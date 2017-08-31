@@ -1,0 +1,4 @@
+#ifndef TRAYCE_SERVER_H
+#define TRAYCE_SERVER_H
+
+#endif //TRAYCE_SERVER_H
