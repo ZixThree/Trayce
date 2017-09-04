@@ -12,8 +12,8 @@ struct Socket::SocketImpl final
     SocketImpl();
     ~SocketImpl();
 
-    void connect(const IPEndPoint& endpoint);
-    void connect(const std::string& address);
+    bool connect(const IPEndPoint& endpoint);
+    bool connect(const std::string& address);
     void close();
 
     bool isConnected();
@@ -22,6 +22,8 @@ struct Socket::SocketImpl final
     IPEndPoint getRemoteEndPoint();
 
 private:
+    void internalClose();
+
     ::SOCKET internalSocket;
 };
 
