@@ -77,12 +77,19 @@ void LogService::LogServiceImpl::sendLog(
 void LogService::LogServiceImpl::log(LogLevel level, LogCategoryId categoryId, const char* message, va_list args) {
 
     auto timestamp = std::chrono::high_resolution_clock::now();
-    Trayce::Time::TimePoint timePoint{
-            static_cast<unsigned long long>(std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch()).count())
-    };
+    Trayce::Time::TimePoint timePoint =
+            Trayce::Time::TimePoint::fromEpoch(
+                    Trayce::Time::TimeSpan::fromNanoseconds(
+                            std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch()).count()
+                    )
+            );
 
     char formattedMessage[8192];
+#if _WIN32
     vsprintf_s(formattedMessage, 8192, message, args);
+#else
+    vsnprintf(formattedMessage, 8192, message, args);
+#endif
 
     sendLog(timePoint, level, Categories[categoryId].CategoryName.c_str(), formattedMessage);
 }
@@ -96,7 +103,7 @@ LogCategoryId LogService::LogServiceImpl::registerCategory(const char *Name) {
     }
 
     Categories.push_back(LogCategory{Name});
-    return Categories.size() - 1;
+    return static_cast<LogCategoryId>(Categories.size() - 1);
 }
 
 LogService::LogService() = default;
