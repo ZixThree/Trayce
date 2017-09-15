@@ -87,7 +87,7 @@ bool Socket::SocketImpl::connect(const IPEndPoint &endpoint) {
             closesocket(internalSocket);
             internalSocket = INVALID_SOCKET;
         }
-        return returnCode == 0;
+        return (returnCode == 0);
     }
 
     return false;
@@ -101,15 +101,71 @@ void Socket::SocketImpl::close() {
 }
 
 bool Socket::SocketImpl::isConnected() {
-    return false;
+    return internalSocket != INVALID_SOCKET;
 }
 
 IPEndPoint Socket::SocketImpl::getLocalEndPoint() {
-    return IPEndPoint();
+    if (!isConnected()) {
+        LogService::get().log(LogLevel::Warning, GTrayceCommCategoryId, "Unable to get local endpoint: not connected.");
+        return IPEndPoint();
+    }
+
+    int addr_length;
+    struct sockaddr_storage addr;
+    if (getsockname(internalSocket, (struct sockaddr*)&addr, &addr_length) != SOCKET_ERROR) {
+        LogService::get().log(LogLevel::Error, GTrayceCommCategoryId, "Unable to get local endpoint: error code %i.", WSAGetLastError());
+        return IPEndPoint();
+    }
+
+    IPEndPoint endPoint;
+    if(addr.ss_family == AF_INET) {
+        struct sockaddr_in *ipv4_addr = (struct sockaddr_in*)&addr;
+        endPoint.address.family = AddressFamily::IPv4;
+        *((int*)&endPoint.address.address) = ipv4_addr->sin_addr.S_un.S_addr;
+        endPoint.port = ntohs(ipv4_addr->sin_port);
+    } else if(addr.ss_family == AF_INET6) {
+        LogService::get().log(LogLevel::Error, GTrayceCommCategoryId, "Not implemented, IPv6");
+//        struct sockaddr_in6 *ipv6_addr = (struct sockaddr_in6 *) &addr;
+//        memcpy(endPoint.address.address, ipv6_addr->sin6_addr, sizeof(char) * 8);
+//        endPoint.port = ntohs(ipv6_addr->sin_port);
+        return IPEndPoint();
+    } else {
+        LogService::get().log(LogLevel::Error, GTrayceCommCategoryId, "Unknown family address in local endpoint.");
+        return IPEndPoint();
+    }
+    return endPoint;
 }
 
 IPEndPoint Socket::SocketImpl::getRemoteEndPoint() {
-    return IPEndPoint();
+    if (!isConnected()) {
+        LogService::get().log(LogLevel::Warning, GTrayceCommCategoryId, "Unable to get remote endpoint: not connected.");
+        return IPEndPoint();
+    }
+
+    int addr_length;
+    struct sockaddr_storage addr;
+    if (getpeername(internalSocket, (struct sockaddr*)&addr, &addr_length) != SOCKET_ERROR) {
+        LogService::get().log(LogLevel::Error, GTrayceCommCategoryId, "Unable to get remote endpoint: error code %i.", WSAGetLastError());
+        return IPEndPoint();
+    }
+
+    IPEndPoint endPoint;
+    if(addr.ss_family == AF_INET) {
+        struct sockaddr_in *ipv4_addr = (struct sockaddr_in*)&addr;
+        endPoint.address.family = AddressFamily::IPv4;
+        *((int*)&endPoint.address.address) = ipv4_addr->sin_addr.S_un.S_addr;
+        endPoint.port = ntohs(ipv4_addr->sin_port);
+    } else if(addr.ss_family == AF_INET6) {
+        LogService::get().log(LogLevel::Error, GTrayceCommCategoryId, "Not implemented, IPv6");
+//        struct sockaddr_in6 *ipv6_addr = (struct sockaddr_in6 *) &addr;
+//        memcpy(endPoint.address.address, ipv6_addr->sin6_addr, sizeof(char) * 8);
+//        endPoint.port = ntohs(ipv6_addr->sin_port);
+        return IPEndPoint();
+    } else {
+        LogService::get().log(LogLevel::Error, GTrayceCommCategoryId, "Unknown family address in remote endpoint.");
+        return IPEndPoint();
+    }
+    return endPoint;
 }
 
 }} // Trayce::Comm

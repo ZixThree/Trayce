@@ -16,6 +16,8 @@ struct IPAddress
 {
     AddressFamily family;
     char          address[16];
+
+
 };
 
 struct IPEndPoint
