@@ -9,7 +9,7 @@ namespace Trayce { namespace Time {
 
 struct TimePoint;
 struct TimeSpan final {
-    TimeSpan() = default;
+    constexpr TimeSpan() = default;
     ~TimeSpan() = default;
 
     template<typename T> constexpr static typename std::enable_if<std::is_arithmetic<T>::value, TimeSpan>::type fromHours(T hours);
@@ -26,8 +26,9 @@ struct TimeSpan final {
 
     constexpr unsigned long long totalNanoseconds() const { return nanoSpan; }
 
-    friend constexpr TimePoint operator+(const TimePoint& left, const TimeSpan& right);
-    friend constexpr TimePoint operator-(const TimePoint& left, const TimeSpan& right);
+    friend constexpr TimeSpan operator+(const TimeSpan& left, const TimeSpan& right);
+    friend constexpr TimeSpan operator-(const TimeSpan& left, const TimeSpan& right);
+
 protected:
     constexpr TimeSpan(unsigned long long nanoTimeSpan) : nanoSpan(nanoTimeSpan) { }
 
@@ -37,9 +38,12 @@ private:
 
 static_assert(std::is_pod<TimeSpan>::value, "TimeSpan should be a pod.");
 
+struct DateTime;
 struct TimePoint final {
-    TimePoint() = default;
+    constexpr TimePoint() = default;
     ~TimePoint() = default;
+
+    constexpr unsigned long long getNanosecondsFromEpoch() const;
 
     static constexpr TimePoint fromEpoch(const TimeSpan& timeSpan);
 
@@ -53,7 +57,6 @@ private:
 };
 
 static_assert(std::is_pod<TimePoint>::value, "TimePoint should be a pod.");
-
 
 template<typename T>
 constexpr typename std::enable_if<std::is_arithmetic<T>::value, TimeSpan>::type TimeSpan::fromHours(T hours) {
@@ -105,16 +108,31 @@ constexpr typename std::enable_if<std::is_arithmetic<T>::value, TimeSpan>::type 
     return TimeSpan(nanoseconds);
 }
 
+constexpr unsigned long long TimePoint::getNanosecondsFromEpoch() const
+{
+    return nanoFromEpoch;
+}
+
 constexpr TimePoint TimePoint::fromEpoch(const TimeSpan& timeSpan) {
     return TimePoint(timeSpan.totalNanoseconds());
 }
 
+constexpr TimeSpan operator+(const TimeSpan& left, const TimeSpan& right)
+{
+    return TimeSpan(left.totalNanoseconds() + right.totalNanoseconds());
+}
+
+constexpr TimeSpan operator-(const TimeSpan& left, const TimeSpan& right)
+{
+    return TimeSpan(left.totalNanoseconds() - right.totalNanoseconds());
+}
+
 constexpr TimePoint operator+(const TimePoint& left, const TimeSpan& right) {
-    return TimePoint{left.nanoFromEpoch + right.nanoSpan};
+    return TimePoint{left.nanoFromEpoch + right.totalNanoseconds()};
 }
 
 constexpr TimePoint operator-(const TimePoint& left, const TimeSpan& right) {
-    return TimePoint{left.nanoFromEpoch + right.nanoSpan};
+    return TimePoint{left.nanoFromEpoch + right.totalNanoseconds()};
 }
 
 }} // Trayce::Time
