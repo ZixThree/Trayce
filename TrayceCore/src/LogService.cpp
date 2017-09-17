@@ -1,5 +1,5 @@
 #include "Trayce/LogService.h"
-#include "Trayce/Time.h"
+#include "Trayce/Time/TimePoint.h"
 #include "InternalData.h"
 
 #include <mutex>

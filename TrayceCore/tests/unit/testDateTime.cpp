@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "Trayce/DateTime.h"
-#include "Trayce/Time.h"
+#include "Trayce/Time/DateTime.h"
+#include "Trayce/Time/TimeSpan.h"
 
 using namespace Trayce::Time;
 

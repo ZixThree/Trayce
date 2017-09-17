@@ -1,8 +1,10 @@
 PROJECT(TrayceCore)
 
 SET(TrayceCore_HEADERS
+        include/Trayce/Time/DateTime.h
+        include/Trayce/Time/TimePoint.h
+        include/Trayce/Time/TimeSpan.h
         include/Trayce/LogService.h
-        include/Trayce/Time.h
         )
 SET(TrayceCore_SOURCES
         src/LogService.cpp

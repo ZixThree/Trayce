@@ -1,4 +1,7 @@
-#include "Trayce/Time.h"
+#ifndef TRAYCE_CORE_TIME_DATETIME_H_
+#define TRAYCE_CORE_TIME_DATETIME_H_
+
+#include "Trayce/Time/TimeSpan.h"
 
 namespace Trayce { namespace Time
 {
@@ -125,3 +128,5 @@ constexpr TimeSpan DateTime::getTimeComponent() const
 }
 
 }} // Trayce::Time
+
+#endif // TRAYCE_CORE_TIME_DATETIME_H_
