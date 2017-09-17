@@ -6,7 +6,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <stdarg.h>
+#include <cstdarg>
 
 namespace Trayce { namespace Log {
 
