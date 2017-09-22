@@ -7,8 +7,9 @@ SET(TrayceCore_HEADERS
         include/Trayce/LogService.h
         )
 SET(TrayceCore_SOURCES
-        src/LogService.cpp
         src/InternalData.h
+        src/LogService.cpp
+        src/TimePoint.cpp
         )
 
 ADD_LIBRARY(TrayceCore STATIC ${TrayceCore_HEADERS} ${TrayceCore_SOURCES})

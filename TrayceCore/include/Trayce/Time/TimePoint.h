@@ -6,7 +6,7 @@
 namespace Trayce { namespace Time {
 
 struct TimePoint final {
-    constexpr TimePoint() = default;
+    constexpr TimePoint();
     ~TimePoint() = default;
 
     constexpr unsigned long long getNanosecondsFromEpoch() const;
@@ -22,7 +22,12 @@ private:
     unsigned long long nanoFromEpoch;
 };
 
-static_assert(std::is_pod<TimePoint>::value, "TimePoint should be a pod.");
+//static_assert(std::is_pod<TimePoint>::value, "TimePoint should be a pod.");
+
+constexpr TimePoint::TimePoint()
+    : nanoFromEpoch(0)
+{
+}
 
 constexpr unsigned long long TimePoint::getNanosecondsFromEpoch() const
 {
@@ -40,6 +45,9 @@ constexpr TimePoint operator+(const TimePoint& left, const TimeSpan& right) {
 constexpr TimePoint operator-(const TimePoint& left, const TimeSpan& right) {
     return TimePoint{left.nanoFromEpoch + right.totalNanoseconds()};
 }
+
+struct DateTime;
+constexpr DateTime to_datetime(const TimePoint& tp);
 
 }} // Trayce::Time
 

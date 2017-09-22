@@ -5,6 +5,21 @@
 
 using namespace Trayce::Time;
 
+TEST(DateTime, isLeapYear)
+{
+	// divisible by 4, but not by 100 unless by 400.
+	ASSERT_TRUE (DateTime::isLeapYear(4));
+	ASSERT_FALSE(DateTime::isLeapYear(7));
+	ASSERT_FALSE(DateTime::isLeapYear(100));
+	ASSERT_FALSE(DateTime::isLeapYear(399));
+	ASSERT_TRUE (DateTime::isLeapYear(400));
+	ASSERT_FALSE(DateTime::isLeapYear(401));
+	ASSERT_TRUE (DateTime::isLeapYear(404));
+	ASSERT_TRUE (DateTime::isLeapYear(2000));
+	ASSERT_FALSE(DateTime::isLeapYear(1900));
+	ASSERT_TRUE (DateTime::isLeapYear(9200));
+}
+
 TEST(DateTime, constructDate)
 {
     DateTime dt {2017, 06, 20};
@@ -97,4 +112,68 @@ TEST(DateTime, constructDateWithTimeSpan)
     ASSERT_EQ(0, dtHours.getSecond());
     ASSERT_EQ(0, dtHours.getMinute());
     ASSERT_EQ(13, dtHours.getHour());
+}
+
+TEST(DateTime, DateToDays)
+{
+	int dayCount = 0;
+	for (int year = 1; year < 10000; ++year)
+	{
+		const int monthList[] = {
+			31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+		};
+		const int leapMonthList[] = {
+			31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+		};
+
+		const bool isLeapYear = DateTime::isLeapYear(year);
+
+		for (int month = 0; month < 12; ++month)
+		{
+			const int monthLength = (isLeapYear ? leapMonthList[month] : monthList[month]);
+
+			for (int day = 0; day < monthLength; day++)
+			{
+				DateTime date(year, month + 1, day + 1);
+
+				ASSERT_EQ(++dayCount, *reinterpret_cast<int*>(&date));
+			}
+		}
+	}
+}
+
+TEST(DateTime, AdvanceDays)
+{
+    DateTime dt{1, 1, 1};
+
+    ASSERT_EQ(1, dt.getYear());
+    ASSERT_EQ(1, dt.getMonth());
+    ASSERT_EQ(1, dt.getDay());
+
+    for(int year = 1; year < 10000; ++year)
+    {
+        const int monthList[] = {
+                31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+        };
+        const int leapMonthList[] = {
+                31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+        };
+
+        // divisible by 4, but not by 100 unless by 400.
+		const bool isLeapYear = DateTime::isLeapYear(year);
+
+        for(int month = 0; month < 12; ++month)
+        {
+            const int monthLength = (isLeapYear ? leapMonthList[month] : monthList[month]);
+
+            for(int day = 0; day < monthLength; day++)
+            {
+                ASSERT_EQ(year, dt.getYear()) << "(" << year << ", " << (month+1) << ", " << (day+1) << ") " << *reinterpret_cast<int*>(&dt);
+				ASSERT_EQ(month + 1, dt.getMonth()) << "(" << year << ", " << (month+1) << ", " << (day+1) << ") " << *reinterpret_cast<int*>(&dt);
+                ASSERT_EQ(day + 1, dt.getDay()) << "(" << year << ", " << (month+1) << ", " << (day+1) << ") " << *reinterpret_cast<int*>(&dt);
+
+                dt = dt + TimeSpan::fromDays(1);
+            }
+        }
+    }
 }
