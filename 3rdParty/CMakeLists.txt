@@ -1,1 +1,2 @@
+ADD_SUBDIRECTORY(googlebenchmark)
 ADD_SUBDIRECTORY(googletest)

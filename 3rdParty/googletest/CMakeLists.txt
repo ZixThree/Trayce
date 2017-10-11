@@ -12,7 +12,7 @@ EXTERNALPROJECT_ADD(
         googletest_external
         URL                 https://codeload.github.com/google/googletest/tar.gz/release-1.8.0
         URL_HASH            SHA1=e7e646a6204638fe8e87e165292b8dd9cd4c36ed
-        CMAKE_ARGS          "-Dgtest_force_shared_crt=ON"
+        CMAKE_ARGS          "-Dgtest_force_shared_crt=ON;-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         UPDATE_COMMAND      ""
         INSTALL_COMMAND     ""
 )
